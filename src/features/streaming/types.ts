@@ -6,6 +6,8 @@ export interface RealtimePlayerSnapshot {
   mode: RealtimePlayerMode;
   streamStatus: StreamRuntimeStatus | "unknown";
   errorMessage: string | null;
+  hasAudioTrack?: boolean;
+  isAudioActive?: boolean;
 }
 
 export interface RealtimePlayerProps {

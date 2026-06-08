@@ -4,6 +4,16 @@ import type { LoginRequest, SignupRequest, SignupResponse, TokenResponse } from 
 const MOCK_ACCESS_TOKEN = "mock-access-token";
 const MOCK_SESSION_MINUTES = 240;
 
+export class AuthApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "AuthApiError";
+    this.status = status;
+  }
+}
+
 export async function loginRequest(credentials: LoginRequest): Promise<TokenResponse> {
   return mockTokenResponse(credentials.username || "operator01");
 }
@@ -28,6 +38,14 @@ export function persistTokenResponse(token: TokenResponse): void {
     expiresAt: new Date(Date.now() + token.expires_in_minutes * 60_000).toISOString(),
     user: { username: token.username, role: token.role },
   });
+}
+
+export async function authenticatedFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  fetcher: typeof fetch = fetch,
+): Promise<Response> {
+  return fetcher(input, init);
 }
 
 function mockTokenResponse(username: string): TokenResponse {

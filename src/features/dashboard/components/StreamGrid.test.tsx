@@ -70,6 +70,6 @@ describe("SelectedStreamPanel", () => {
 
     expect(screen.getByRole("heading", { name: "선택 스트림" })).toBeInTheDocument();
     expect(screen.getByText("스트리밍 3")).toBeInTheDocument();
-    expect(screen.getByText("AI 감지 overlay / raw.sample.rear")).toBeInTheDocument();
+    expect(screen.getByText("AI 감지 overlay")).toBeInTheDocument();
   });
 });

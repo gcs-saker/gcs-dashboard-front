@@ -2,6 +2,9 @@ export type DashboardServerHealth = "online" | "degraded" | "error";
 
 export interface DashboardServerStatusSnapshot {
   server: DashboardServerHealth;
+  apiServer: DashboardServerHealth;
+  authServer: DashboardServerHealth;
+  signalingServer: DashboardServerHealth;
   readiness: DashboardServerHealth;
   streams: DashboardServerHealth;
   latencyMs: number | null;
@@ -9,19 +12,26 @@ export interface DashboardServerStatusSnapshot {
 }
 
 export const DEFAULT_SERVER_STATUS: DashboardServerStatusSnapshot = {
-  server: "online",
-  readiness: "online",
-  streams: "online",
-  latencyMs: 42,
+  server: "degraded",
+  apiServer: "degraded",
+  authServer: "degraded",
+  signalingServer: "degraded",
+  readiness: "degraded",
+  streams: "degraded",
+  latencyMs: null,
   checkedAt: null,
 };
 
-export async function fetchDashboardServerStatus(
-  fetcher: typeof fetch = fetch,
-): Promise<DashboardServerStatusSnapshot> {
+export async function fetchDashboardServerStatus(fetcher: typeof fetch = fetch): Promise<DashboardServerStatusSnapshot> {
   void fetcher;
   return {
-    ...DEFAULT_SERVER_STATUS,
+    server: "online",
+    apiServer: "online",
+    authServer: "online",
+    signalingServer: "online",
+    readiness: "online",
+    streams: "online",
+    latencyMs: 42,
     checkedAt: Date.now(),
   };
 }
