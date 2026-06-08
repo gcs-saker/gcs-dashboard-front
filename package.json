@@ -1,0 +1,71 @@
+{
+  "name": "gcs-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@react-three/drei": "10.7.7",
+    "@react-three/fiber": "9.6.1",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "leaflet": "1.9.4",
+    "leaflet-compass": "1.5.6",
+    "leaflet-measure": "3.1.0",
+    "leaflet-measure-path": "1.5.0",
+    "leaflet-minimap": "3.6.1",
+    "leaflet-rotatedmarker": "0.2.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-leaflet": "5.0.0",
+    "react-router-dom": "7.15.1",
+    "recharts": "3.8.1",
+    "sass": "1.100.0",
+    "three": "0.184.0",
+    "web-vitals": "5.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.2.0",
+    "@vitest/coverage-istanbul": "4.1.7",
+    "jsdom": "29.1.1",
+    "typescript": "6.0.3",
+    "vite": "7.3.3",
+    "vitest": "4.1.7"
+  },
+  "overrides": {
+    "lodash": "4.18.1",
+    "picomatch@2": "2.3.2"
+  },
+  "scripts": {
+    "start": "vite --host 0.0.0.0",
+    "dev": "vite --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:smoke:failure": "vitest run src/features/streaming/components/RealtimePlayer.test.tsx",
+    "test:coverage": "vitest run --coverage",
+    "audit": "npm audit --audit-level=moderate"
+  },
+  "vitest": {
+    "collectCoverageFrom": [
+      "src/**/*.{jsx,ts,tsx}",
+      "!src/index.tsx",
+      "!src/reportWebVitals.js",
+      "!src/setupTests.js"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

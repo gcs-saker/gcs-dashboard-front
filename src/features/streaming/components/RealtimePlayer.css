@@ -1,0 +1,124 @@
+.realtime-player {
+  display: grid;
+  grid-template-rows: minmax(220px, 1fr);
+  aspect-ratio: 16 / 9;
+  min-height: 260px;
+  overflow: hidden;
+  position: relative;
+  contain: layout paint;
+  border: 1px solid rgba(74, 144, 196, 0.45);
+  background: #05090f;
+  color: #dce8f4;
+}
+
+.realtime-player__header {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 0;
+  padding: 0;
+  border-bottom: 0;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.realtime-player__badge,
+.realtime-player__latency,
+.realtime-player__stream,
+.realtime-player__mode {
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid rgba(126, 180, 222, 0.45);
+  background: rgba(5, 9, 15, 0.64);
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+.realtime-player__latency {
+  border-color: rgba(61, 184, 255, 0.65);
+  color: #8fc7ff;
+}
+
+.realtime-player__badge {
+  text-transform: uppercase;
+}
+
+.realtime-player__badge--online,
+.realtime-player__badge--registered {
+  border-color: rgba(86, 211, 124, 0.8);
+  color: #8df0a7;
+}
+
+.realtime-player__badge--offline {
+  border-color: rgba(255, 111, 111, 0.75);
+  color: #ffb0a6;
+}
+
+.realtime-player__placeholder {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  padding: 16px;
+  background:
+    linear-gradient(90deg, rgba(61, 184, 255, 0.04), rgba(220, 232, 242, 0.08), rgba(61, 184, 255, 0.04)),
+    #03080d;
+  color: #8fc7ff;
+  font-size: 13px;
+}
+
+.realtime-player__placeholder--offline,
+.realtime-player__placeholder--error {
+  color: #ffb0a6;
+}
+
+.realtime-player__mock-feed {
+  position: relative;
+  display: grid;
+  min-height: 220px;
+  overflow: hidden;
+  place-items: center;
+  background:
+    linear-gradient(120deg, rgba(28, 92, 123, 0.28), rgba(9, 21, 34, 0.92)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 8px);
+}
+
+.realtime-player__mock-feed::before,
+.realtime-player__mock-feed::after {
+  content: "";
+  position: absolute;
+  border: 1px solid rgba(143, 199, 255, 0.34);
+}
+
+.realtime-player__mock-feed::before {
+  inset: 18%;
+}
+
+.realtime-player__mock-feed::after {
+  inset: 35% 22%;
+}
+
+.realtime-player__mock-scanline {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0 44%, rgba(143, 199, 255, 0.18) 50%, transparent 56%);
+}
+
+.realtime-player__mock-reticle {
+  width: 88px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(141, 240, 167, 0.72);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(141, 240, 167, 0.06);
+}
+
+.realtime-player__mock-label {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  color: #dce8f4;
+  font-size: 13px;
+}

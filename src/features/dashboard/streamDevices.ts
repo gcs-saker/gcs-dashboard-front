@@ -1,0 +1,204 @@
+import type {
+  DashboardGeometrySource,
+  DashboardStreamGeometry,
+  DashboardStreamMode,
+  DashboardStreamSlot,
+  DashboardStreamStatus,
+} from "./streamTypes";
+
+export type StreamDeviceGeometry = DashboardStreamGeometry;
+
+export interface StreamDeviceOption {
+  id: string;
+  name: string;
+  streamPath: string;
+  status: DashboardStreamStatus;
+  mediaType: "eo" | "ir" | "ai" | "map";
+  geometry: StreamDeviceGeometry;
+}
+
+export const MOCK_STREAM_DEVICES: StreamDeviceOption[] = [
+  {
+    id: "device-drn-01-front",
+    name: "DRN-01 전방 EO",
+    streamPath: "raw.sample.front",
+    status: "online",
+    mediaType: "eo",
+    geometry: {
+      lat: 35.871435,
+      lng: 128.601445,
+      altitudeM: 120,
+      headingDeg: 130,
+      pitchDeg: -2.1,
+      rollDeg: 1.3,
+      yawDeg: 127,
+      fovDeg: 72,
+      source: "mock",
+    },
+  },
+  {
+    id: "device-drn-02-thermal",
+    name: "DRN-02 열화상",
+    streamPath: "raw.sample.thermal",
+    status: "fallback",
+    mediaType: "ir",
+    geometry: {
+      lat: 35.8781,
+      lng: 128.5948,
+      altitudeM: 96,
+      headingDeg: 178,
+      pitchDeg: -8,
+      rollDeg: 0.5,
+      yawDeg: 176,
+      fovDeg: 58,
+      source: "mock",
+    },
+  },
+  {
+    id: "device-ugv-01-rear",
+    name: "UGV-01 후방 AI",
+    streamPath: "raw.sample.rear",
+    status: "online",
+    mediaType: "ai",
+    geometry: {
+      lat: 35.8669,
+      lng: 128.5931,
+      altitudeM: 18,
+      headingDeg: 84,
+      pitchDeg: 0,
+      rollDeg: 0,
+      yawDeg: 84,
+      fovDeg: 82,
+      source: "mock",
+    },
+  },
+  {
+    id: "device-local-webcam",
+    name: "로컬 웹캠 테스트",
+    streamPath: "raw.local.webcam",
+    status: "offline",
+    mediaType: "eo",
+    geometry: {
+      lat: 35.8724,
+      lng: 128.6072,
+      altitudeM: 12,
+      headingDeg: 24,
+      pitchDeg: 0,
+      rollDeg: 0,
+      yawDeg: 24,
+      fovDeg: 64,
+      source: "mock",
+    },
+  },
+];
+
+function modeForMediaType(mediaType: StreamDeviceOption["mediaType"]): DashboardStreamMode {
+  switch (mediaType) {
+    case "eo":
+      return "EO";
+    case "ir":
+      return "IR";
+    case "ai":
+      return "AI";
+    case "map":
+      return "MAP";
+  }
+}
+
+export function connectDeviceToStreamSlot(
+  stream: DashboardStreamSlot,
+  device: StreamDeviceOption,
+): DashboardStreamSlot {
+  return {
+    ...stream,
+    connectedDeviceId: device.id,
+    detail: `${device.name} / ${device.streamPath}`,
+    mode: modeForMediaType(device.mediaType),
+    status: device.status,
+    streamPath: device.streamPath,
+    geometry: device.geometry,
+  };
+}
+
+export function disconnectStreamSlot(stream: DashboardStreamSlot): DashboardStreamSlot {
+  return {
+    ...stream,
+    connectedDeviceId: null,
+    detail: "장비 미연결",
+    status: "offline",
+    streamPath: null,
+    geometry: null,
+  };
+}
+
+export async function fetchStreamDeviceOptions(fetcher: typeof fetch = fetch): Promise<StreamDeviceOption[]> {
+  void fetcher;
+  return MOCK_STREAM_DEVICES.map((device) => ({
+    ...device,
+    geometry: { ...device.geometry },
+  }));
+}
+
+export function mergeStreamSlotsWithDevices(
+  streams: DashboardStreamSlot[],
+  devices: StreamDeviceOption[],
+): DashboardStreamSlot[] {
+  const devicesByStreamPath = new Map<string, StreamDeviceOption>();
+  for (const device of devices) {
+    if (!devicesByStreamPath.has(device.streamPath)) {
+      devicesByStreamPath.set(device.streamPath, device);
+    }
+  }
+
+  const seenStreamPaths = new Set<string>();
+  const nextStreams = streams.flatMap((stream) => {
+    if (stream.streamPath) {
+      if (seenStreamPaths.has(stream.streamPath)) return [];
+      seenStreamPaths.add(stream.streamPath);
+    }
+
+    if (!stream.streamPath) return stream;
+    const device = devicesByStreamPath.get(stream.streamPath);
+    if (!device) return { ...stream, status: "offline" as const };
+    return {
+      ...stream,
+      connectedDeviceId: stream.connectedDeviceId ?? device.id,
+      detail: `${device.name} / ${device.streamPath}`,
+      mode: modeForMediaType(device.mediaType),
+      status: device.status,
+      geometry: stream.geometry ?? device.geometry,
+    };
+  });
+
+  const knownStreamPaths = new Set(nextStreams.map((stream) => stream.streamPath).filter(Boolean));
+  const discoveredStreams = devices
+    .filter((device) => !knownStreamPaths.has(device.streamPath))
+    .map((device, index): DashboardStreamSlot => ({
+      id: device.streamPath,
+      title: `스트리밍 ${nextStreams.length + index + 1}`,
+      status: device.status,
+      mode: modeForMediaType(device.mediaType),
+      detail: `${device.name} / ${device.streamPath}`,
+      connectedDeviceId: device.id,
+      streamPath: device.streamPath,
+      geometry: device.geometry,
+    }));
+
+  return [...nextStreams, ...discoveredStreams];
+}
+
+function defaultGeometryForStream(streamId: string, source: DashboardGeometrySource = "mock"): StreamDeviceGeometry {
+  const knownDevice = MOCK_STREAM_DEVICES.find((device) => device.streamPath === streamId);
+  if (knownDevice) return { ...knownDevice.geometry, source };
+  return {
+    lat: 35.871435,
+    lng: 128.601445,
+    altitudeM: 0,
+    headingDeg: 0,
+    pitchDeg: 0,
+    rollDeg: 0,
+    yawDeg: 0,
+    fovDeg: 60,
+    source,
+  };
+}
